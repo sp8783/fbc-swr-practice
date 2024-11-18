@@ -1,17 +1,16 @@
-import { useState } from "react";
+import useSWR from "swr";
 import "./App.css";
 
 function App() {
   const url = "https://httpstat.us/200?sleep=2000";
   const headers = { Accept: "application/json" };
+  const fetcher = (url) => fetch(url, { headers }).then((res) => res.json());
 
-  const [status, setStatus] = useState("");
+  const { data, error, isLoading } = useSWR(url, fetcher);
 
-  fetch(url, { headers })
-    .then((res) => res.json())
-    .then((json) => setStatus(json.description));
-
-  return <>{status && <p>Status : {status}</p>}</>;
+  if (error) return <p>Failed to load.</p>;
+  if (isLoading) return <p>Loading...</p>;
+  return <p>Status: {data?.description}</p>;
 }
 
 export default App;
